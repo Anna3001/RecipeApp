@@ -1,0 +1,43 @@
+<h1><%= @recipe.title %></h1>
+
+<% if @recipe.image.attached? %>
+  <div>
+    <%= image_tag @recipe.image %>
+  </div>
+<% end %>
+
+<p><strong>Description:</strong> <%= @recipe.description %></p>
+
+<h2>Ingredients</h2>
+<ul>
+  <% @recipe.ingredients.each do |ingredient| %>
+    <li>
+      <%= ingredient.name %> - <%= ingredient.quantity %>
+      <%= link_to 'Edit', edit_recipe_ingredient_path(@recipe, ingredient) %> |
+      <%= link_to 'Delete', recipe_ingredient_path(@recipe, ingredient), method: :delete, data: { confirm: 'Are you sure?' } %>
+    </li>
+  <% end %>
+</ul>
+
+<h3>Add New Ingredient</h3>
+
+<%= form_with(model: [@recipe, Ingredient.new], local: true) do |form| %>
+  <div class="form-group">
+    <%= form.label :name, "Ingredient Name" %>
+    <%= form.text_field :name, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :quantity, "Quantity" %>
+    <%= form.text_field :quantity, class: 'form-control' %>
+  </div>
+
+  <div>
+    <%= form.submit 'Add Ingredient', class: 'btn btn-primary' %>
+  </div>
+<% end %>
+
+<div>
+  <%= link_to 'Edit Recipe', edit_recipe_path(@recipe), class: 'btn btn-warning' %>
+  <%= link_to 'Back to Recipes', recipes_path, class: 'btn btn-secondary' %>
+</div>

@@ -1,0 +1,26 @@
+<h1>All Recipes</h1>
+
+<%= link_to 'New Recipe', new_recipe_path, class: 'btn btn-primary' %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @recipes.each do |recipe| %>
+      <tr>
+        <td><%= recipe.title %></td>
+        <td><%= recipe.description %></td>
+        <td>
+          <%= link_to 'Show', recipe_path(recipe) %> |
+          <%= link_to 'Edit', edit_recipe_path(recipe) %> |
+          <%= link_to 'Delete', recipe_path(recipe), method: :delete, data: { confirm: 'Are you sure?' } %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
