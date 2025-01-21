@@ -1,26 +1,75 @@
-<h1>All Recipes</h1>
+<div class="container mt-5">
+  <h1 class="text-center text-primary mb-4">Twoje przepisy</h1>
 
-<%= link_to 'New Recipe', new_recipe_path, class: 'btn btn-primary' %>
+  <% if @show_new_recipe_button %>
+  <div class="mb-3">
+    <%= link_to 'Dodaj nowy przepis', new_recipe_path, class: 'btn btn-success btn-lg' %>
+  </div>
+  <% end %>
 
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Description</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
+  <div class="row row-cols-1 row-cols-md-3 g-4">
     <% @recipes.each do |recipe| %>
-      <tr>
-        <td><%= recipe.title %></td>
-        <td><%= recipe.description %></td>
-        <td>
-          <%= link_to 'Show', recipe_path(recipe) %> |
-          <%= link_to 'Edit', edit_recipe_path(recipe) %> |
-          <%= link_to 'Delete', recipe_path(recipe), method: :delete, data: { confirm: 'Are you sure?' } %>
-        </td>
-      </tr>
+      <div class="col">
+        <%= link_to recipe_path(recipe), class: 'card h-100 shadow-sm rounded recipe-card' do %>
+          <% if recipe.main_photo.attached? %>
+            <%= image_tag recipe.main_photo, class: "card-img-top rounded-top recipe-image", alt: "#{recipe.title} image" %>
+          <% else %>
+            <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top rounded-top recipe-image" alt="Placeholder image">
+          <% end %>
+
+          <div class="card-body">
+            <h5 class="card-title text-center"><%= truncate(recipe.title, length: 50) %></h5>
+          </div>
+        <% end %>
+      </div>
     <% end %>
-  </tbody>
-</table>
+  </div>
+</div>
+
+<style>
+  .recipe-card {
+    text-decoration: none;
+  }
+
+  .recipe-image {
+    width: 100%;
+    height: auto; 
+    max-height: 200px; 
+    object-fit: cover; 
+  }
+
+  .recipe-card:hover .card-title {
+    text-decoration: none;
+    color: #007bff; 
+  }
+
+  .recipe-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    line-height: 1.4;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 768px) {
+    .recipe-card {
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 1rem;
+    }
+  }
+</style>

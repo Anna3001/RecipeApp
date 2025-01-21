@@ -1,11 +1,4 @@
 # Rails.application.routes.draw do
-#   get "ingredients/index"
-#   get "ingredients/show"
-#   get "ingredients/new"
-#   get "ingredients/create"
-#   get "ingredients/edit"
-#   get "ingredients/update"
-#   get "ingredients/destroy"
 #   get "recipes/index"
 #   get "recipes/show"
 #   get "recipes/new"
@@ -31,7 +24,14 @@
 Rails.application.routes.draw do
   devise_for :users
   resources :recipes do
-    resources :ingredients
-  end
-  root 'recipes#index'
+    # member do
+    #   delete 'destroy_image/:image_id', to: 'recipes#destroy_image', as: 'destroy_image'
+    # end
+    member do
+      delete 'destroy_attachment/:attachment_id/:attachment_type', to: 'recipes#destroy_attachment', as: 'destroy_attachment'
+    end
+  end     
+  get 'public_recipes', to: 'recipes#public_recipes', as: 'public_recipes'
+  get 'home', to: 'recipes#home', as: 'home'
+  root 'recipes#home'
 end

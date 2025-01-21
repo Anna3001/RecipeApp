@@ -1,7 +1,0 @@
-<h1><%= @ingredient.name %></h1>
-
-<p><strong>Quantity:</strong> <%= @ingredient.quantity %></p>
-
-<%= link_to 'Edit', edit_recipe_ingredient_path(@recipe, @ingredient), class: 'btn btn-warning' %>
-<%= link_to 'Back to Ingredients', recipe_ingredients_path(@recipe), class: 'btn btn-secondary' %>
-<%= link_to 'Delete', recipe_ingredient_path(@recipe, @ingredient), method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger' %>

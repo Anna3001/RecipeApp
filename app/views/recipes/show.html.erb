@@ -1,43 +1,445 @@
-<h1><%= @recipe.title %></h1>
-
-<% if @recipe.image.attached? %>
-  <div>
-    <%= image_tag @recipe.image %>
-  </div>
-<% end %>
-
-<p><strong>Description:</strong> <%= @recipe.description %></p>
-
-<h2>Ingredients</h2>
-<ul>
-  <% @recipe.ingredients.each do |ingredient| %>
-    <li>
-      <%= ingredient.name %> - <%= ingredient.quantity %>
-      <%= link_to 'Edit', edit_recipe_ingredient_path(@recipe, ingredient) %> |
-      <%= link_to 'Delete', recipe_ingredient_path(@recipe, ingredient), method: :delete, data: { confirm: 'Are you sure?' } %>
-    </li>
-  <% end %>
-</ul>
-
-<h3>Add New Ingredient</h3>
-
-<%= form_with(model: [@recipe, Ingredient.new], local: true) do |form| %>
-  <div class="form-group">
-    <%= form.label :name, "Ingredient Name" %>
-    <%= form.text_field :name, class: 'form-control' %>
-  </div>
-
-  <div class="form-group">
-    <%= form.label :quantity, "Quantity" %>
-    <%= form.text_field :quantity, class: 'form-control' %>
-  </div>
-
-  <div>
-    <%= form.submit 'Add Ingredient', class: 'btn btn-primary' %>
-  </div>
-<% end %>
-
-<div>
-  <%= link_to 'Edit Recipe', edit_recipe_path(@recipe), class: 'btn btn-warning' %>
-  <%= link_to 'Back to Recipes', recipes_path, class: 'btn btn-secondary' %>
+<div class="p-5">
+    <%= link_to recipes_path do %>
+      <i class="fas fa-left-long fa-3x"></i>
+    <% end %>
 </div>
+
+<h1 class="text-center mb-5"><%= @recipe.title %></h1>
+
+<% if @recipe.main_photo.attached? %>
+  <%= image_tag @recipe.main_photo, loading: "lazy", class: "img-fluid rounded main-photo" %>
+<% end %>
+
+<div class="container mt-5">
+  <h2 class="text-success">Składniki</h2>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Nazwa</th>
+          <th scope="col">Ilość</th>
+          <th scope="col">Notatka</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @recipe.ingredients.each do |ingredient| %>
+          <tr>
+            <td><%= ingredient.name %></td>
+            <td><%= ingredient.amount %></td>
+            <td><%= ingredient.note %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+  <div class="container-xl mb-5">
+    <h2 class="text-info">Instrukcja</h2>
+    <p class="lead"><%= @recipe.description %></p>
+  </div>
+
+<div class="container mt-5">
+    <h2>Załączniki</h2>
+    <div class="accordion" id="fileAccordion">
+
+      <!-- Section 1: Documents -->
+      <% if @recipe.documents.attached? %>
+        <div class="accordion-item">
+          
+          <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              Dokumenty
+            </button>
+          </h2>
+          
+          <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne">
+            <div class="accordion-body">
+              <div class="row">
+
+                  <% @recipe.documents.each do |document| %>
+                    <div class="col-md-3 mb-3 text-center">
+                      <i class="fas fa-file-alt text-secondary fa-3x"></i>
+                      <p>
+                        <% if document.content_type == "text/plain" %>
+                          <a href="#" 
+                            class="txt-file-link" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#txtFileModal" 
+                            data-txt-content="<%= document.download.force_encoding("UTF-8") %>">
+                            <%= document.filename %>
+                          </a>
+                        <% elsif document.content_type == "application/pdf" %>
+                            <%= document.filename %>
+                        <% else %>
+                          <a href="<%= url_for(document) %>" 
+                            target="_blank" 
+                            class="default-file-link">
+                            <%= document.filename %>
+                          </a>
+                        <% end %>
+                      </p>
+
+                          <div class="document-actions d-flex justify-content-center align-items-center gap-3">
+                              <% if document.content_type == "text/plain" %>          
+                              <% elsif document.content_type == "application/pdf" %>
+                                <a href="<%= url_for(document) %>" 
+                                  target="_blank" 
+                                  class="pdf-file-link">
+                                  <i class="fas fa-eye text-secondary fs-6"></i>
+                                </a>
+                              <% end %>  
+
+                            <%= link_to document, download: document.filename.to_s, class: "mx-2" do %>
+                              <i class="fas fa-download text-secondary fs-6"></i>
+                            <% end %>
+
+                            <%= button_to destroy_attachment_recipe_path(@recipe, attachment_id: document.id, attachment_type: 'documents'), 
+                                        method: :delete, 
+                                        data: { confirm: 'Czy na pewno chcesz usunąć ten plik?' }, 
+                                        class: "btn btn-link p-0" do %>
+                              <i class="fas fa-trash-alt text-secondary fs-6"></i>
+                            <% end %>
+                          </div>
+
+                    </div>
+                  <% end %>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Section 2: Photos -->
+
+<% if @recipe.images.attached? %>
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingTwo">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+        Zdjęcia
+      </button>
+    </h2>
+
+    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo">
+      <div class="accordion-body">
+        <div class="row">
+          <% @recipe.images.each_with_index do |image, index| %>
+            <div class="col-md-3 mb-3 d-flex align-items-center justify-content-center">
+              <div class="me-2">
+                <%= link_to '#', data: { bs_toggle: "modal", bs_target: "#photoModal", bs_index: index } do %>
+                  <%= image_tag image, loading: "lazy", class: "rounded centered-image" %>
+                <% end %>
+              </div>
+
+              <div class="d-flex flex-column align-items-center gap-1">
+                <%= link_to '#', data: { bs_toggle: "modal", bs_target: "#photoModal", bs_index: index } do %>
+                  <i class="fas fa-eye text-secondary fs-6"></i>
+                <% end %>
+
+                <%= link_to image, download: image.filename.to_s do %>
+                  <i class="fas fa-download text-secondary fs-6"></i>
+                <% end %>
+
+                <%= button_to destroy_attachment_recipe_path(@recipe, attachment_id: image.id, attachment_type: 'images'), 
+                            method: :delete, 
+                            data: { confirm: 'Are you sure you want to delete this attachment?' }, 
+                            class: "btn btn-link p-0" do %>
+                  <i class="fas fa-trash-alt text-secondary fs-6"></i>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+      <!-- Section 3: Videos -->
+      <% if @recipe.videos.attached? %>
+      <div class="accordion-item">
+        
+        <h2 class="accordion-header" id="headingThree">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            Pliki wideo
+          </button>
+        </h2>
+
+        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree">
+          <div class="accordion-body">
+
+            <div class="row file-section" id="videoGrid">
+
+              <% @recipe.videos.each do |video| %>
+                <div class="col-md-4 file-tile mb-3">
+                  <video controls class="rounded w-100">
+                    <source src="<%= url_for(video) %>" type="<%= video.content_type %>">
+                    Your browser does not support the video tag.
+                  </video>
+                  <p class="text-center"><%= video.filename.to_s %></p>
+                  <div class="video-actions mt-3 d-flex justify-content-center align-items-center gap-3">
+                      <%= link_to video, download: video.filename.to_s, class: "mx-2" do %>
+                        <i class="fas fa-download text-secondary fs-6"></i>
+                      <% end %>
+
+                      <%= button_to destroy_attachment_recipe_path(@recipe, attachment_id: video.id, attachment_type: 'videos'), 
+                                  method: :delete, 
+                                  data: { confirm: 'Czy na pewno chcesz usunąć ten plik wideo?' }, 
+                                  class: "btn btn-link p-0" do %>
+                        <i class="fas fa-trash-alt text-secondary fs-6"></i>
+                      <% end %>
+                    </div>
+                  
+                </div>
+              <% end %>  
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <% end %>
+
+      <!-- Section 4: Audios -->
+      <% if @recipe.audios.attached? %>
+      <div class="accordion-item">
+        
+        <h2 class="accordion-header" id="headingFour">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+            Pliki audio
+          </button>
+        </h2>
+
+          <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour">
+            <div class="accordion-body">
+              <div class="row">
+
+                <% @recipe.audios.each do |audio| %>
+                  <div class="col-md-3 mb-3 text-center">
+                    <audio controls>
+                      <source src="<%= url_for(audio) %>" type="<%= audio.content_type %>">
+                      Twoja przeglądarka nie obsługuje elementu audio.
+                    </audio>
+
+                    <p><%= audio.filename.to_s %></p>
+                    
+                    <div class="audio-actions mt-3 d-flex justify-content-center align-items-center gap-3">
+                      <%= link_to audio, download: audio.filename.to_s, class: "mx-2" do %>
+                        <i class="fas fa-download text-secondary fs-6"></i>
+                      <% end %>
+
+                      <%= button_to destroy_attachment_recipe_path(@recipe, attachment_id: audio.id, attachment_type: 'audios'), 
+                                  method: :delete, 
+                                  data: { confirm: 'Czy na pewno chcesz usunąć ten plik audio?' }, 
+                                  class: "btn btn-link p-0" do %>
+                        <i class="fas fa-trash-alt text-secondary fs-6"></i>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>           
+
+              </div>
+            </div>
+          </div>   
+      
+      </div>
+      <% end %>
+
+    </div>
+  </div>
+
+<div class="container mt-5 mb-5">
+  <div class="d-flex justify-content-between align-items-center">
+    <%= link_to 'Wróć do listy przepisów', recipes_path, class: 'btn btn-secondary btn-lg' %>
+    
+    <% if @show_buttons %>
+      <div class="d-flex">
+        <%= link_to 'Edytuj przepis', edit_recipe_path(@recipe), class: 'btn btn-warning btn-lg me-2' %>
+        <%= button_to 'Usuń przepis', recipe_path(@recipe), method: :delete, id: "cancel-recipe-button", data: { confirm: 'Czy jesteś pewien?' }, class: 'btn btn-danger btn-lg' %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+  
+<div class="modal fade" id="txtFileModal" tabindex="-1" aria-labelledby="txtFileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="txtFileModalLabel">Treść pliku</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="file-content-container">
+          <pre id="txtFileContent" class="text-wrap"></pre>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="photoModalLabel">Zdjęcia</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="photoCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            <% if @recipe.images.attached? %>
+              <% @recipe.images.each_with_index do |image, index| %>
+                <div class="carousel-item <%= 'active' if index == 0 %>">
+                  <%= image_tag image, class: "d-block w-100" %>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+
+          <button class="carousel-control-prev" type="button" data-bs-target="#photoCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Poprzedni</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#photoCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Następny</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('.txt-file-link').forEach(link => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        const fileContent = event.target.dataset.txtContent;
+
+        document.getElementById('txtFileContent').textContent = fileContent;
+      });
+    });
+  });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const cancelButton = document.getElementById("cancel-recipe-button");
+
+    if (cancelButton) {
+      cancelButton.addEventListener("click", function (event) {
+        const confirmationMessage = cancelButton.dataset.confirmation || "Czy na pewno chcesz usunąć ten przepis?";
+
+        if (!confirm(confirmationMessage)) {
+          event.preventDefault();
+        }
+      });
+    }
+  });
+</script>
+
+<style>
+  #txtFileModal .modal-content {
+    max-height: 80vh;
+    overflow-y: auto; 
+  }
+
+  #txtFileContent {
+    white-space: pre-wrap; 
+    word-wrap: break-word;
+  }
+
+ .tile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 200px; 
+    text-align: center;
+    padding: 10px;
+  }
+
+  .centered-image {
+    max-width: 150px;
+    max-height: 150px; 
+    object-fit: contain; 
+    display: block;
+    margin: auto; 
+  }
+
+  .tile-content {
+    width: 100%; 
+    height: 100%; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .image-actions i {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .image-actions i:hover {
+    transform: scale(1.2);
+  }
+
+  .image-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; 
+  }
+
+  .carousel-item img {
+    max-height: 80vh;
+    object-fit: contain;
+  }
+
+  .main-photo {
+    max-width: 100%;
+    max-height: 50vh;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+    overflow-x: auto;
+  }
+
+  .table td, .table th {
+    word-wrap: break-word;
+    max-width: 150px; 
+  }
+
+  #txtFileContent {
+    font-size: 1.4rem; 
+    line-height: 1.6; 
+    font-family: monospace; 
+    white-space: pre;
+    overflow-x: auto;
+    padding: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .table td, .table th {
+      padding: 8px; 
+      font-size: 12px; 
+    }
+
+    .table-responsive {
+      margin-bottom: 15px; 
+    }
+  }
+</style>
