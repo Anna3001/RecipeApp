@@ -1,5 +1,9 @@
 <div class="container mt-5">
-  <h1 class="text-center text-primary mb-4">Twoje przepisy</h1>
+  <% if @show_new_recipe_button %>
+    <h1 class="text-center text-primary mb-4">Twoje przepisy</h1>
+  <% else %>
+    <h1 class="text-center text-primary mb-4">Przepisy publiczne</h1>
+  <% end %>  
 
   <% if @show_new_recipe_button %>
   <div class="mb-3">

@@ -70,7 +70,11 @@
                             <%= document.filename %>
                           </a>
                         <% elsif document.content_type == "application/pdf" %>
+                          <a href="<%= url_for(document) %>" 
+                            target="_blank" 
+                            class="pdf-file-link">
                             <%= document.filename %>
+                          </a>
                         <% else %>
                           <a href="<%= url_for(document) %>" 
                             target="_blank" 
@@ -81,24 +85,16 @@
                       </p>
 
                           <div class="document-actions d-flex justify-content-center align-items-center gap-3">
-                              <% if document.content_type == "text/plain" %>          
-                              <% elsif document.content_type == "application/pdf" %>
-                                <a href="<%= url_for(document) %>" 
-                                  target="_blank" 
-                                  class="pdf-file-link">
-                                  <i class="fas fa-eye text-secondary fs-6"></i>
-                                </a>
-                              <% end %>  
-
                             <%= link_to document, download: document.filename.to_s, class: "mx-2" do %>
                               <i class="fas fa-download text-secondary fs-6"></i>
                             <% end %>
-
+                            <% if @show_buttons %>
                             <%= button_to destroy_attachment_recipe_path(@recipe, attachment_id: document.id, attachment_type: 'documents'), 
                                         method: :delete, 
                                         data: { confirm: 'Czy na pewno chcesz usunąć ten plik?' }, 
                                         class: "btn btn-link p-0" do %>
                               <i class="fas fa-trash-alt text-secondary fs-6"></i>
+                            <% end %>
                             <% end %>
                           </div>
 
@@ -140,12 +136,13 @@
                 <%= link_to image, download: image.filename.to_s do %>
                   <i class="fas fa-download text-secondary fs-6"></i>
                 <% end %>
-
+                <% if @show_buttons %>
                 <%= button_to destroy_attachment_recipe_path(@recipe, attachment_id: image.id, attachment_type: 'images'), 
                             method: :delete, 
                             data: { confirm: 'Are you sure you want to delete this attachment?' }, 
                             class: "btn btn-link p-0" do %>
                   <i class="fas fa-trash-alt text-secondary fs-6"></i>
+                <% end %>
                 <% end %>
               </div>
             </div>
@@ -182,12 +179,13 @@
                       <%= link_to video, download: video.filename.to_s, class: "mx-2" do %>
                         <i class="fas fa-download text-secondary fs-6"></i>
                       <% end %>
-
+                      <% if @show_buttons %>
                       <%= button_to destroy_attachment_recipe_path(@recipe, attachment_id: video.id, attachment_type: 'videos'), 
                                   method: :delete, 
                                   data: { confirm: 'Czy na pewno chcesz usunąć ten plik wideo?' }, 
                                   class: "btn btn-link p-0" do %>
                         <i class="fas fa-trash-alt text-secondary fs-6"></i>
+                      <% end %>
                       <% end %>
                     </div>
                   
@@ -227,12 +225,13 @@
                       <%= link_to audio, download: audio.filename.to_s, class: "mx-2" do %>
                         <i class="fas fa-download text-secondary fs-6"></i>
                       <% end %>
-
+                      <% if @show_buttons %>
                       <%= button_to destroy_attachment_recipe_path(@recipe, attachment_id: audio.id, attachment_type: 'audios'), 
                                   method: :delete, 
                                   data: { confirm: 'Czy na pewno chcesz usunąć ten plik audio?' }, 
                                   class: "btn btn-link p-0" do %>
                         <i class="fas fa-trash-alt text-secondary fs-6"></i>
+                      <% end %>
                       <% end %>
                     </div>
                   </div>
