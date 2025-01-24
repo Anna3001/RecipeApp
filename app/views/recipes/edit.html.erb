@@ -65,45 +65,60 @@
     <% end %>
   </div>
 
-  <div class="form-group mb-3">
-    <%= form.label :images, "Załącz zdjęcia", class: 'form-label' %>
-    <%= form.file_field :images, multiple: true, class: 'form-control' %>
-    <% if @recipe.errors[:images].any? %>
-      <div class="text-danger"><%= @recipe.errors[:images].join(", ") %></div>
-    <% end %>
-  </div>
+  <div class="accordion mb-4" id="mediaAccordion">
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingMedia">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMedia" aria-expanded="false" aria-controls="collapseMedia">
+        Załącz pliki (Zdjęcia, Pliki Wideo, Pliki Audio, Dokumenty)
+      </button>
+    </h2>
+    <div id="collapseMedia" class="accordion-collapse collapse" aria-labelledby="headingMedia" data-bs-parent="#mediaAccordion">
+      <div class="accordion-body">
+        
+        <div class="form-group mb-3">
+          <%= form.label :images, "Załącz zdjęcia", class: 'form-label' %>
+          <%= form.file_field :images, multiple: true, class: 'form-control' %>
+          <% if @recipe.errors[:images].any? %>
+            <div class="text-danger"><%= @recipe.errors[:images].join(", ") %></div>
+          <% end %>
+        </div>
 
-  <div class="form-group mb-3">
-    <%= form.label :videos, "Załącz pliki wideo", class: 'form-label' %>
-    <%= form.file_field :videos, multiple: true, class: 'form-control' %>
-    <% if @recipe.errors[:videos].any? %>
-      <div class="text-danger"><%= @recipe.errors[:videos].join(", ") %></div>
-    <% end %>
-  </div>
+      <div class="form-group mb-3">
+        <%= form.label :videos, "Załącz pliki wideo", class: 'form-label' %>
+        <%= form.file_field :videos, multiple: true, class: 'form-control' %>
+        <% if @recipe.errors[:videos].any? %>
+          <div class="text-danger"><%= @recipe.errors[:videos].join(", ") %></div>
+        <% end %>
+      </div>
 
-  <div class="form-group mb-3">
-    <%= form.label :audios, "Załącz pliki audio", class: 'form-label' %>
-    <%= form.file_field :audios, multiple: true, class: 'form-control' %>
-    <% if @recipe.errors[:audios].any? %>
-      <div class="text-danger"><%= @recipe.errors[:audios].join(", ") %></div>
-    <% end %>
-  </div>
+      <div class="form-group mb-3">
+        <%= form.label :audios, "Załącz pliki audio", class: 'form-label' %>
+        <%= form.file_field :audios, multiple: true, class: 'form-control' %>
+        <% if @recipe.errors[:audios].any? %>
+          <div class="text-danger"><%= @recipe.errors[:audios].join(", ") %></div>
+        <% end %>
+      </div>
 
-  <div class="form-group mb-5">
-    <%= form.label :documents, "Załącz dokumenty", class: 'form-label' %>
-    <%= form.file_field :documents, multiple: true, class: 'form-control' %>
-    <% if @recipe.errors[:documents].any? %>
-      <div class="text-danger"><%= @recipe.errors[:documents].join(", ") %></div>
-    <% end %>
-  </div>
+      <div class="form-group mb-5">
+        <%= form.label :documents, "Załącz dokumenty", class: 'form-label' %>
+        <%= form.file_field :documents, multiple: true, class: 'form-control' %>
+        <% if @recipe.errors[:documents].any? %>
+          <div class="text-danger"><%= @recipe.errors[:documents].join(", ") %></div>
+        <% end %>
+      </div>
 
-  <div class="form-group mb-3">
-    <%= form.label :public, "Upublicznij przepis", class: 'form-label' %>
-    <div class="form-check form-switch">
-      <%= form.check_box :public, class: 'form-check-input large-switch', role: 'switch', id: 'public-checkbox' %>
-      <span id="public-status" class="ms-2"><%= @recipe.public ? "Ten przepis jest publiczny" : "Ten przepis nie jest publiczny" %></span>
+      </div>
     </div>
   </div>
+</div>
+
+        <div class="form-group mb-3">
+        <%= form.label :public, "Upublicznij przepis", class: 'form-label' %>
+        <div class="form-check form-switch">
+          <%= form.check_box :public, class: 'form-check-input large-switch', role: 'switch', id: 'public-checkbox' %>
+          <span id="public-status" class="ms-2"><%= @recipe.public ? "Ten przepis jest publiczny" : "Ten przepis nie jest publiczny" %></span>
+        </div>
+      </div>
 
   <div class="form-group text-center mb-4">
     <%= form.submit 'Aktualizuj Przepis', class: 'btn btn-primary btn-lg' %>
